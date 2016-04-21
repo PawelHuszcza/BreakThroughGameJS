@@ -6,6 +6,8 @@ define(function() {
 	var refreshIntervalId = null;
 	var paddleMoving = false;
 	
+	var eventReceiver = null;
+	
 	var isPointInCirlce = function (point_x, point_y, circle_x, circle_y) {
 		//alert("Ola !!!!! " + point_x + ", y: " + point_y + ", circle x: " + cricle_x + ", circle y: " + circle_y);
 		var a1 = (point_x - circle_x);
@@ -105,7 +107,11 @@ define(function() {
 		var dy = model.getDY();
 		//alert("Hey there ! 1234354");
 		if(y + dy > model.getCanvas().height-radius) {
-			alert("GAME OVER!");
+			alert("GAME OVER! You will start from beginning!");
+	        if (model.getRefreshIntervalId() != null) {
+	        	
+	        	clearInterval(model.getRefreshIntervalId());
+	        }
 		    document.location.reload();
 			//dy = -dy;
 		}
@@ -157,10 +163,18 @@ define(function() {
 	}
 	
 	var play = function () {
-		createBricks();
-		movePaddle();
-		animateBall();
-		endPlaySegment();
+		if (model.isGameOn()) {
+			createBricks();
+			movePaddle();
+			animateBall();
+			endPlaySegment();
+			
+			if (eventReceiver != null) {
+				eventReceiver.notify();
+			}
+		} else {
+			
+		}
 	}
 	
 	function keyDownHandler(e) {
@@ -184,11 +198,21 @@ define(function() {
 	}
 	
 	var Methods = {
-		  animate: function(m) {
+			
+		setEventReceiver: function(receiver) {
+			eventReceiver = receiver;
+		},
+			
+	    animate: function(m) {
 			model = m;
 			if (model && typeof m.getInterval == 'function') {
 				interval = m.getInterval();
-				refreshIntervalId = setInterval(play, interval);
+				
+				if (m.getRefreshIntervalId() == null) {
+					
+					refreshIntervalId = setInterval(play, interval);
+					m.setRefreshIntervalId(refreshIntervalId);
+				}
 			}
 		},
 			

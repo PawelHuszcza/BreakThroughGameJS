@@ -1,5 +1,5 @@
 
-define(['data', 'updater'], function(model, controller){
+define(['data', 'updater', 'controllers'], function(model, controller, handlers){
 	
 	var canvas = model.getCanvas();
 	var context = model.getContext();
@@ -67,6 +67,8 @@ define(['data', 'updater'], function(model, controller){
 	};
 	
 	var startAnimation = function () {
+		handlers.setModel(model);
+		controller.setEventReceiver(handlers);
 		model.addObserver(observer);
 		controller.startListen();
 		controller.animate(model);

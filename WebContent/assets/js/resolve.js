@@ -17,9 +17,7 @@ requirejs.config({
 		game: 'localfiles/game',
 		data: 'localfiles/data',
 		updater: 'localfiles/updater',
-		handlers: 'localfiles/handlers',
-		states_list: 'localfiles/states_list',
-		animation_balancer: 'localfiles/animation_balancer'
+		controllers: 'localfiles/controllers'
 	}
 });
 

@@ -4,8 +4,12 @@ define(function(){
 	var canvas = document.getElementById("gameCanvas");
 	var context = canvas.getContext("2d");
 	
+	var refreshIntervalId = null;
+	
 	var right = false;
 	var left = false;
+	
+	var gameOn = true;
 	
 	var brickRowCount = 3;
 	var brickWidth = 75;
@@ -13,10 +17,15 @@ define(function(){
 	var brickPadding = 10;
 	var brickOffsetTop = 30;
 	var brickOffsetLeft = 30;
+	
+	var gameScore = 0;
+	var gamesPlayed = 0;
 	/*
 	 * brickColumnCount, ought to be 5.
 	 */
 	var brickColumnCount = Math.floor((canvas.width-(brickOffsetLeft*2))/(brickWidth+brickPadding));
+	
+	var stillactiveBricks = (brickColumnCount+1) * (brickRowCount+1);
 	
 	var paddleHeight = 10;
 	var paddleWidth = 75;
@@ -90,6 +99,38 @@ define(function(){
 	var bricks_top_left_corners = new Array();
 	
 	var Properties = {
+			
+		setRefreshIntervalId: function (id) {
+			refreshIntervalId = id;
+		},
+		
+		getRefreshIntervalId: function () {
+			return refreshIntervalId;
+		},
+			
+		registerVictory: function () {
+			gamesPlayed++;
+		},
+			
+		getGamesPlayed: function () {
+			return gamesPlayed;
+		},
+			
+		getGameScore: function () {
+			return gameScore;
+		},
+			
+		isGameOn: function () {
+			return gameOn;
+		},
+		
+		setGameOff: function() {
+			gameOn = false;
+		},
+		
+		setGameOn: function () {
+			gameOn = true;
+		},
 		          
 		getPaddle_x_edge_x: function (defValue) {
 			if (paddle_x_edge) {
@@ -209,6 +250,10 @@ define(function(){
 		
 		setBrickState: function (index, newstate) {
 			bricks[index].state = newstate;
+			if (newstate === 0) {
+				gameScore++;
+				stillactiveBricks--;
+			}
 		},
 		
 		newState: function () {
@@ -247,6 +292,17 @@ define(function(){
 				}
 			}
 			return -1;
+		},
+		
+		resetBricks: function () {
+			for (var i = 0;i < bricks.length;i++) {
+				bricks[i].state=1;
+			}
+			stillactiveBricks = (brickColumnCount+1) * (brickRowCount+1);
+			paddleX = (canvas.width-paddleWidth)/2;
+			paddleY = canvas.height-paddleHeight;
+			x = canvas.width/2;
+			y = canvas.height - 30;
 		},
 			
 		isBrickActive: function (brickIndex) {
@@ -370,6 +426,10 @@ define(function(){
 		
 		setViewInterval: function (value) {
 			viewInterval = value;
+		},
+		
+		isWin: function () {
+			return stillactiveBricks <= 0;
 		}
 	};
 	
